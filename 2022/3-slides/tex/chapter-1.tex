@@ -1,0 +1,1144 @@
+\documentclass[11pt]{beamer}
+\usetheme{CambridgeUS}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{pgfpages}
+\usepackage{framed}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{soul}
+\usepackage{empheq}
+\usepackage{minted}
+
+% The replacement character � (often displayed as a black rhombus with a white
+% question mark) is a symbol found in the Unicode standard at code point U
+% +FFFD in the Specials table. It is used to indicate problems when a system 
+% is unable to render a stream of data to a correct symbol.[4] It is usually 
+% seen when the data is invalid and does not match any character. For this 
+% reason we map explicitly this character to a blanck space.
+\DeclareUnicodeCharacter{FFFD}{ }
+
+\newcommand*{\itemimg}[1]{%
+  \raisebox{-.3\baselineskip}{%
+    \includegraphics[
+      height=\baselineskip,
+      width=\baselineskip,
+      keepaspectratio,
+    ]{#1}%
+  }%
+}
+
+\newtcbox{\mymath}[1][]{%
+    nobeforeafter, math upper, tcbox raise base,
+    enhanced, colframe=blue!30!black,
+    colback=blue!10, boxrule=1pt,
+    #1}
+
+\newcommand{\highlight}[1]{%
+  \colorbox{yellow!100}{$\displaystyle#1$}}
+
+\author{Giovanni Della Lunga\\{\footnotesize giovanni.dellalunga@unibo.it}}
+%\title{4.1 - Linear and Logistic Regression}
+%\title{4.2 - Decision Trees}
+\title{1 - Introduction to Deep Learning}
+%\title{6 - Text Vectorization}
+%\title{7 - Classification for Text Analysis}
+%\title{8 - Clustering for Text Similarity}
+%\title{9 - Information Extraction}
+\subtitle{} % (optional)
+\setbeamercovered{transparent} 
+\institute{Introduction to Machine Learning for Finance} 
+\date{Bologna - February, 2022} 
+\begin{document}
+
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\AtBeginSection[]
+{
+  %\begin{frame}<beamer>
+  %\footnotesize	
+  %\frametitle{Outline}
+  %\begin{multicols}{2}
+  %\tableofcontents[currentsection]
+  %\end{multicols}	  
+  %\normalsize
+  %\end{frame}
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}  	\usebeamerfont{title}\insertsectionhead\par%
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
+\AtBeginSubsection{\frame{\subsectionpage}}
+
+% INSERT HERE
+
+\begin{frame}{We will talk about...}
+\begin{itemize}
+\item What is a Neural Network
+\item Feedforward Neural Networks
+\item Keras: the Python Deep Learning API  
+\end{itemize}
+\end{frame}
+
+\section{Machine Learning and Deep Learning}
+%---------------------------------------------------------------------------------------------------
+\begin{frame}{Machine Learning and Deep Learning}
+\begin{columns}[T] % align columns
+\begin{column}{.48\textwidth}
+        \begin{itemize}
+		\item As we know to do machine learning we need three things:
+		\item Input data points
+		\item Examples of the expected output
+		\item A way to measure whether the algorithm is doing a good job
+        \end{itemize}
+\end{column}%
+\hfill%
+\begin{column}{.48\textwidth}
+    %\fbox{
+        \includegraphics[width=\linewidth]{../5-pictures/03_intro_to_deep_learning_pic_0.png}
+    %}
+\end{column}%
+\end{columns}
+\end{frame}
+%..................................................................
+\begin{frame}{Machine Learning and Deep Learning}
+\begin{center}
+\includegraphics[scale=.35]{../5-pictures/chapter-0-0_pic_12.jpg} 
+\end{center}
+\end{frame}
+%..................................................................
+\begin{frame}{Machine Learning and Deep Learning}
+\begin{center}
+\includegraphics[scale=.75]{../5-pictures/chapter-0-0_pic_16.png} 
+\end{center}
+\end{frame}
+%..................................................................
+\begin{frame}{Machine Learning and Deep Learning}
+\begin{center}
+\includegraphics[scale=.45]{../5-pictures/chapter-0-0_pic_17.png} 
+\end{center}
+\end{frame}
+%..................................................................
+\begin{frame}{Machine Learning and Deep Learning}
+\begin{center}
+\includegraphics[scale=.35]{../5-pictures/chapter-0-0_pic_13.jpg} 
+\end{center}
+\end{frame}
+%..................................................................
+\begin{frame}{Machine Learning and Deep Learning}
+\begin{center}
+\includegraphics[scale=.35]{../5-pictures/chapter-0-0_pic_14.jpg} 
+\end{center}
+\end{frame}
+%..................................................................
+\begin{frame}{Machine Learning and Deep Learning}
+\begin{center}
+\includegraphics[scale=.35]{../5-pictures/chapter-0-0_pic_15.jpg} 
+\end{center}
+\end{frame}
+%..................................................................
+\begin{frame}{Machine Learning and Deep Learning}
+	\begin{itemize}
+		\item A machine-learning model transforms its input data into meaningful outputs, a process that is \textbf{learned} from exposure to known examples of inputs and outputs. 
+		\item Therefore, the central problem in machine learning and deep learning is to \textbf{meaningfully transform data}: in other words, \textbf{to learn useful representations of the input data at hand, representations that get us closer to the expected output}. 
+		\item What is a representation? At its core, it is simply a different way to look at data, to represent or encode data.
+	\end{itemize}
+\end{frame}
+%..................................................................
+\begin{frame}{Machine Learning and Deep Learning}
+\begin{itemize}
+\item From a formal poin of view, deep learning learning process involves input variables, which we call $X$, and output variables, which we call $Y$. 
+
+\item We us neural network \highlight{\text{to learn the mapping function}} from the input to the output. 
+
+\item In simple mathematics, the output $Y$ is a dependent variable of input $X$ as illustrated by:
+
+$$Y = f(X)$$
+\end{itemize}
+
+\begin{tcolorbox}
+Here, our end goal is to try to \textbf{approximate the mapping function} $f$, so that we can \textbf{predict} the output variables $Y$ when we have new input data $X$.
+\end{tcolorbox}
+\end{frame}
+%..................................................................
+\begin{frame}{Machine Learning and Deep Learning}
+	Deep learning is a specific subfield of machine learning: a new take on learning representations from data that puts an emphasis on learning successive layers of increasingly meaningful representations.
+	\begin{center}
+	\includegraphics[scale=0.7]{../5-pictures/03_intro_to_deep_learning_pic_1.png}
+	\end{center}
+\end{frame}
+%..................................................................
+\begin{frame}{Machine Learning and Deep Learning}
+	Deep learning is a specific subfield of machine learning: a new take on learning representations from data that puts an emphasis on learning successive layers of increasingly meaningful representations.
+	\begin{center}
+	\includegraphics[scale=0.5]{../5-pictures/03_intro_to_deep_learning_pic_2.png}
+	\end{center}
+\end{frame}
+%..................................................................
+\begin{frame}{Machine Learning and Deep Learning}
+	In deep learning, these layered representations are (almost always) learned via models called \textbf{neural networks}, structured in literal \highlight{\text{layers}} stacked on top of each other.
+	\begin{center}
+	\includegraphics[scale=0.5]{../5-pictures/03_intro_to_deep_learning_pic_3.png}
+	\end{center}
+\end{frame}
+%..................................................................
+%---------------------------------------------------------------------------------------------------
+\subsection{The McCulloch-Pitts Neuron}
+%---------------------------------------------------------------------------------------------------
+\begin{frame}{Mc-Culloch and Pitts Neuron}
+	\begin{center}
+	\includegraphics[scale=0.5]{../5-pictures/03_intro_to_deep_learning_pic_4.png}
+	\end{center}
+\end{frame}
+%..................................................................
+\begin{frame}{NN Data Flow: Input Data}
+	\begin{center}
+	\includegraphics[scale=0.4]{../5-pictures/03_intro_to_deep_learning_pic_5.png}
+	\end{center}
+\end{frame}
+%..................................................................
+\begin{frame}{NN Data Flow: Weights}
+	\begin{center}
+	\includegraphics[scale=0.4]{../5-pictures/03_intro_to_deep_learning_pic_6.png}
+	\end{center}
+\end{frame}
+%..................................................................
+\begin{frame}{NN Data Flow: Weighted Input}
+	\begin{center}
+	\includegraphics[scale=0.4]{../5-pictures/03_intro_to_deep_learning_pic_7.png}
+	\end{center}
+\end{frame}
+%..................................................................
+\begin{frame}{NN Data Flow: Weighted Input}
+From a functional point of view
+	\begin{itemize}
+		\item an input signal formally present but associated with a zero weight is equivalent to an absence of signal;
+		\item the threshold can be considered as an additional synapse, connected in input with a fixed weight equal to 1;
+	\end{itemize}
+\end{frame}
+%..................................................................
+\begin{frame}{NN Data Flow: Bias}
+	\begin{center}
+	\includegraphics[scale=0.4]{../5-pictures/03_intro_to_deep_learning_pic_8.png}
+	\end{center}
+\end{frame}
+%..................................................................
+\begin{frame}{NN Data Flow: Weighted Output}
+	\begin{center}
+	\includegraphics[scale=0.4]{../5-pictures/03_intro_to_deep_learning_pic_9.png}
+	\end{center}
+\end{frame}
+%..................................................................
+\begin{frame}{NN Data Flow: Activation Function}
+	\begin{center}
+	\includegraphics[scale=0.4]{../5-pictures/03_intro_to_deep_learning_pic_10.png}
+	\end{center}
+\end{frame}
+%..................................................................
+\begin{frame}{NN Data Flow: Activation Function}
+	\begin{itemize}
+		\item The function $f$ is called the response or activation function:
+		\item The primary role of the Activation Function is to transform the summed weighted input from the node into an output value to be fed to the next hidden layer or as output. 
+		\item Activation Function decides whether a neuron should be activated or not. 
+		\item This means that \textbf{it will decide whether the neuron’s input to the network is important or not in the process of prediction using simpler mathematical operations}. 
+	\end{itemize}
+\end{frame}
+%..................................................................
+\begin{frame}{NN Data Flow: Activation Function}
+	\begin{itemize}
+		\item In the McCulloch and Pitts neuron $f$ is simply the step function, so the answer is binary: it is $1$ if the weighted sum of the stimuli exceeds the internal threshold; $0$ otherwise.
+\begin{equation} a = \sum\limits_{i=1}^n w_i \, x_i - \theta \end{equation}
+\begin{equation} y = f(a) = \begin{cases} 0, \quad \text{if} \, a \le 0 \\ 1, \quad \text{if} \, a > 0\end{cases} \end{equation}
+		\item Other models of artificial neurons predict continuous response functions
+	\end{itemize}
+\end{frame}
+%..................................................................
+\begin{frame}{NN Data Flow: Activation Function}
+	\begin{center}
+	\includegraphics[scale=0.4]{../5-pictures/03_intro_to_deep_learning_pic_12.png}
+	\end{center}
+\end{frame}
+%..................................................................
+\begin{frame}{NN Data Flow: Activation Function}
+	\begin{center}
+	\includegraphics[scale=0.4]{../5-pictures/03_intro_to_deep_learning_pic_13.png}
+	\end{center}
+\end{frame}
+%..................................................................
+\begin{frame}{NN Data Flow: Output}
+	\begin{center}
+	\includegraphics[scale=0.4]{../5-pictures/03_intro_to_deep_learning_pic_11.png}
+	\end{center}
+\end{frame}
+%---------------------------------------------------------------------------------------------------
+\subsection{Basic Elements of a Neural Network}
+%---------------------------------------------------------------------------------------------------
+%..................................................................
+\begin{frame}{Neural Network Basic Constituents}
+A neural network consists of:
+	\begin{itemize}
+		\item A set of nodes (neurons), or units connected by links.
+		\item A set of \textbf{weights} associated with links.
+		\item A set of thresholds or activation levels.
+	\end{itemize}
+Neural network design requires:
+\begin{itemize}
+		\item The choice of the number and type of units.
+		\item The determination of the morphological structure.
+		\item Coding of training examples, in terms of network inputs and outputs.
+		\item Initialization and training of weights on interconnections, through the set of learning examples.
+\end{itemize}
+\end{frame}
+%..................................................................
+\begin{frame}{Neural Network Basic Constituents}
+	\begin{itemize}
+		\item The specification of what a layer does to its input data is stored in the layer's weights, which in essence are a bunch of numbers. 
+		\item In technical terms, we could say that the transformation implemented by a layer is parameterized by its weights (Weights are also sometimes called the parameters of a layer.) 
+		\item In this context, \textbf{learning means finding a set of values for the weights of all layers in a network, such that the network will correctly map example inputs to their associated targets}.
+	\end{itemize}
+\end{frame}
+%..................................................................
+\begin{frame}{Loss Function}
+\begin{columns}[T] % align columns
+\begin{column}{.48\textwidth}
+        \begin{itemize}
+		\item To control the output of a neural network, you need to be able to measure how far this output is from what you expected. 
+		\item This is the job of the \textbf{loss function} of the network, also called the objective function. 
+        \end{itemize}
+\end{column}%
+\hfill%
+\begin{column}{.48\textwidth}
+    %\fbox{
+        \includegraphics[width=\linewidth]{../5-pictures/03_intro_to_deep_learning_pic_14.png}
+    %}
+\end{column}%
+\end{columns}
+\end{frame}
+\begin{frame}{Loss Function}
+\begin{columns}[T] % align columns
+\begin{column}{.48\textwidth}
+        \begin{itemize}
+		\item The loss function takes the predictions of the network and the true target (what you wanted the network to output) and \textbf{computes a distance score, capturing how well the network has done on this specific example}
+        \end{itemize}
+\end{column}%
+\hfill%
+\begin{column}{.48\textwidth}
+    %\fbox{
+        \includegraphics[width=\linewidth]{../5-pictures/03_intro_to_deep_learning_pic_15.png}
+    %}
+\end{column}%
+\end{columns}
+\end{frame}
+\begin{frame}{Loss Function}
+	\begin{center}
+	\includegraphics[scale=0.4]{../5-pictures/03_intro_to_deep_learning_pic_16.png}
+	\end{center}
+\end{frame}
+%..................................................................
+\begin{frame}{Backpropagation}
+\begin{columns}[T] % align columns
+\begin{column}{.48\textwidth}
+        \begin{itemize}
+		\item The fundamental trick in deep learning is to use this score as a feedback signal to adjust the value of the weights a little, in a direction that will lower the loss score for the current example. 
+		\item This adjustment is the job of the optimizer, which implements what is called the Backpropagation algorithm: the central algorithm in deep learning.
+        \end{itemize}
+\end{column}%
+\hfill%
+\begin{column}{.48\textwidth}
+    %\fbox{
+        \includegraphics[width=\linewidth]{../5-pictures/03_intro_to_deep_learning_pic_17.png}
+    %}
+\end{column}%
+\end{columns}
+\end{frame}
+%---------------------------------------------------------------------------------------------------
+\section{Implementing a Single Layer NN}
+%---------------------------------------------------------------------------------------------------
+%..................................................................
+\begin{frame}{Implementing a Single Layer NN}
+\begin{columns}[T] % align columns
+\begin{column}{.48\textwidth}
+\begin{itemize}
+\item In each hidden unit, take $a_1$ as example, \textbf{a linear operation followed by an activation function, $f$, is performed}. 
+\item So given input $x = (x_1, x_2)$, \textbf{inside node $a_1$}, we have:
+\begin{align*}
+&z_1 = w_{11}x_1 + w_{12}x_2 + b_1 \\
+&a_1 = f(w_{11}x_1 + w_{12}x_2 + b_1) = f(z_1) 
+\end{align*}
+\end{itemize}
+\end{column}%
+\hfill%
+\begin{column}{.48\textwidth}
+    %\fbox{
+        \includegraphics[width=\linewidth]{../5-pictures/03_intro_to_deep_learning_pic_18.png}
+    %}
+\end{column}%
+\end{columns}
+\end{frame}
+%..................................................................
+\begin{frame}{Implementing a Single Layer NN}
+\begin{columns}[T] % align columns
+\begin{column}{.48\textwidth}
+\begin{itemize}
+\item Same for node $a_2$, it would have:
+\begin{align*}
+&z_2 = w_{21}x_1 + w_{22}x_2 + b_2    \\
+&a_2  = f(w_{21}x_1 + w_{22}x_2 + b_2) = f(z_2) 
+\end{align*}	
+\item And same for $a_3$ and $a_4$ and so on
+
+\end{itemize}
+\end{column}%
+\hfill%
+\begin{column}{.48\textwidth}
+    %\fbox{
+        \includegraphics[width=\linewidth]{../5-pictures/03_intro_to_deep_learning_pic_19.png}
+    %}
+\end{column}%
+\end{columns}
+\end{frame}
+%..................................................................
+\begin{frame}{Implementing a single Layer NN}
+We can also write in a more compact form
+\begin{equation}
+\begin{pmatrix}
+z_1 \\ z_2 \\ z_3 \\ z_4
+\end{pmatrix} =
+\begin{pmatrix}
+w_{11} & w_{12} \\ w_{21} & w_{22} \\ w_{31} & w_{32} \\ w_{41} & w_{42}
+\end{pmatrix} 
+\cdot 
+\begin{pmatrix}
+x_1 \\ x_2 
+\end{pmatrix}
++
+\begin{pmatrix}
+b_1 \\ b_2 \\ b_3 \\ b_4
+\end{pmatrix} 
+\Rightarrow Z^{[1]} = W^{[1]} \cdot X + B^{[1]} 
+\end{equation}
+\vspace{0.5cm}
+
+\textbf{The output is one value $y_1$ in $[0, 1]$, consider this a binary classification task with a prediction of probability}
+\end{frame}
+%..................................................................
+\begin{frame}[fragile]
+\frametitle{Dataset Generation}
+Scikit-learn includes various random sample generators that can be used to build artificial datasets of controlled size and complexity. Here we generate a simple binary classification task with 5000 data points and 20 features for later model validation.
+\rule{\textwidth}{1pt}
+\scriptsize
+\begin{minted}{python}
+from sklearn import datasets
+#
+X, y = datasets.make_classification(n_samples=5000, random_state=123)
+#
+X_train, X_test = X[:4000], X[4000:]
+y_train, y_test = y[:4000], y[4000:]
+#
+print('train shape', X_train.shape)
+print('test shape', X_test.shape)
+\end{minted}
+\rule{\textwidth}{1pt}
+\end{frame}
+%..................................................................
+\begin{frame}{Implementing a single Layer NN}
+Let's assume that the first activation function is the $\tanh$ and the output activation function is the $sigmoid$. So the result of the hidden layer is:
+$$ A^{[1]} = \tanh{Z^{[1]}} $$
+This result is applied to the output node which will perform another linear operation with a different set of weights, $W^{[2]}$:
+$$ Z^{[2]} = W^{[2]} \cdot A^{[1]} + B^{[2]} $$
+and the final output will be the result of the application of the output node activation function (the sigmoid) to this value:
+$$ \hat{y} = \sigma({Z^{[2]}}) = A^{[2]}$$
+\end{frame}
+%..................................................................
+\begin{frame}{Implementing a single Layer NN}
+\begin{center}
+\includegraphics[scale=.4]{../5-pictures/03_intro_to_deep_learning_pic_18_b.png} \end{center}
+\end{frame}
+%..................................................................
+\begin{frame}{Implementing a single Layer NN}
+\begin{center}
+\includegraphics[scale=.4]{../5-pictures/03_intro_to_deep_learning_pic_18_c.png} \end{center}
+\end{frame}
+%..................................................................
+\begin{frame}{Implementing a single Layer NN}
+\begin{center}
+\includegraphics[scale=.4]{../5-pictures/03_intro_to_deep_learning_pic_18_d.png} \end{center}
+\end{frame}
+%..................................................................
+\begin{frame}{Implementing a single Layer NN}
+\begin{center}
+\includegraphics[scale=.4]{../5-pictures/03_intro_to_deep_learning_pic_18_e.png} \end{center}
+\end{frame}
+%..................................................................
+\begin{frame}[fragile]
+\frametitle{Weights Initialization}
+\begin{itemize}
+\item Our neural network has 1 hidden layer and 2 layers in total (hidden layer + output layer), so there are 4 weight matrices to initialize ( $W^{[1]}$,$b^{[1]}$  and  $W^{[2]}$,$b^{[2]}$). 
+\item Notice that the weights are initialized relatively small so that the gradients would be higher thus learning faster in the beginning phase.
+\end{itemize}
+\rule{\textwidth}{1pt}
+\scriptsize
+\begin{minted}{python}
+
+def init_weights(n_input, n_hidden, n_output):
+    params = {}
+    params['W1'] = np.random.randn(n_hidden, n_input) * 0.01
+    params['b1'] = np.zeros((n_hidden, 1))
+    params['W2'] = np.random.randn(n_output, n_hidden) * 0.01
+    params['b2'] = np.zeros((n_output, 1))
+    
+    return params
+\end{minted}
+\rule{\textwidth}{1pt}
+\end{frame}
+%..................................................................
+\begin{frame}[fragile]
+\frametitle{Weights Initialization}
+\begin{itemize}
+\item Our neural network has 1 hidden layer and 2 layers in total (hidden layer + output layer), so there are 4 weight matrices to initialize ( $W^{[1]}$,$b^{[1]}$  and  $W^{[2]}$,$b^{[2]}$). 
+\item Notice that the weights are initialized relatively small so that the gradients would be higher thus learning faster in the beginning phase.
+\end{itemize}
+\rule{\textwidth}{1pt}
+\scriptsize
+\begin{minted}{python}
+
+params = init_weights(20, 10, 1)
+
+print('W1 shape', params['W1'].shape)
+print('b1 shape', params['b1'].shape)
+print('W2 shape', params['W2'].shape)
+print('b2 shape', params['b2'].shape)
+
+\end{minted}
+\rule{\textwidth}{1pt}
+\end{frame}
+%..................................................................
+\begin{frame}[fragile]
+\frametitle{Forward Propagation}
+\scriptsize
+
+\begin{align*}
+\hat y &= A^{[2]} = \sigma(Z^{[2]} = \sigma \left( W^{[2]} \cdot A^{[1]} + B^{[2]} \right) \\
+&= \sigma \left( W^{[2]} \cdot \tanh{Z^{[1]}} + B^{[2]} \right) \\
+&= \sigma \left[ W^{[2]} \cdot \tanh\left( W^{[1]} \cdot X + B^{[1]} \right) + B^{[2]} \right]
+\end{align*}
+
+\rule{\textwidth}{1pt}
+\begin{minted}{python}
+
+def forward(X, params):
+    W1, b1, W2, b2 = params['W1'], params['b1'], params['W2'], params['b2']
+    A0 = X
+    cache = {}
+    Z1 = np.dot(W1, A0) + b1
+    A1 = tanh(Z1)
+    Z2 = np.dot(W2, A1) + b2
+    A2 = sigmoid(Z2)
+    cache['Z1'] = Z1
+    cache['A1'] = A1
+    cache['Z2'] = Z2
+    cache['A2'] = A2
+    return  cache
+
+\end{minted}
+\rule{\textwidth}{1pt}
+\end{frame}
+%..................................................................
+\begin{frame}{Activation Functions}
+Function tanh and sigmoid looks as below. Notice that the only difference of these functions is the scale of y.
+	\begin{center}
+	\includegraphics[scale=0.7]{../5-pictures/03_intro_to_deep_learning_pic_19_b.png}
+	\end{center}
+\end{frame}
+%..................................................................
+\begin{frame}{Logistic Loss Function}
+Since we have a binary classification problem, we can assume a Logistic Loss Function (see the problem of logistic regression)
+\begin{equation}
+L(y, \hat{y}) = 
+\begin{cases} 
+-\log{\hat{y}} & \text{when}\, y = 1 \\ -\log(1 - \hat{y}) & \text{when}\, y = 0 
+\end{cases} 
+\end{equation}
+$$ L(y, \hat{y}) = -[y\log{\hat{y}} + (1 - y)\log{(1 - \hat{y})}] $$
+
+Where $\hat y$ is our \highlight{\text{prediction}} ranging in $[0, 1]$ and $y$ is the \highlight{\text{true}} value. 
+
+\end{frame}
+%..................................................................
+\begin{frame}[fragile]
+\frametitle{Logistic Loss Function}
+
+$$ L(y, \hat{y}) = -[y\log{\hat{y}} + (1 - y)\log{(1 - \hat{y})}] $$
+
+\rule{\textwidth}{1pt}
+\scriptsize
+\begin{minted}{python}
+
+def loss(Y, Y_hat):
+    """
+    Y: vector of true value
+    Y_hat: vector of predicted value
+    """
+    assert Y.shape[0] == 1
+    assert Y.shape == Y_hat.shape
+    m = Y.shape[1]
+    s = Y * np.log(Y_hat) + (1 - Y) * np.log(1 - Y_hat)
+    loss = -np.sum(s) / m
+    return loss
+
+\end{minted}
+\rule{\textwidth}{1pt}
+\end{frame}
+%..................................................................
+\begin{frame}{Delta Rule}
+\begin{itemize}
+\item Given a generic actual value $y$, we want to minimize the loss $L$, and the technic we are going to apply here is gradient descent; 
+\item basically what we need to do is to apply derivative to our variables and move them slightly down to the optimum. 
+\item Here we have 2 variables, $W$ and $b$, and for this example, the update formula of them would be:
+
+\begin{align*}
+&W = W - \frac{\partial L}{\partial W} \\
+&b = b - \frac{\partial L}{\partial b}
+\end{align*}
+
+\end{itemize}
+\end{frame}
+%..................................................................
+\begin{frame}{Delta Rule}
+\begin{itemize}
+\item The delta rule algorithm works by computing the gradient of the loss function with respect to each weight. 
+\item Remember that
+\begin{align*}
+\hat y &= A^{[2]} = \sigma(Z^{[2]} = \sigma \left( W^{[2]} \cdot A^{[1]} + B^{[2]} \right) \\
+&= \sigma \left( W^{[2]} \cdot \tanh{Z^{[1]}} + B^{[2]} \right) \\
+&= \sigma \left[ W^{[2]} \cdot \tanh\left( W^{[1]} \cdot X + B^{[1]} \right) + B^{[2]} \right]
+\end{align*}
+\end{itemize}
+\begin{tcolorbox}
+As you can see $\hat y$ depends on both $W^{[1]}$ and $W^{[2]}$. The specification of what a layer does to its input data is stored in the layer's weights. Remember once again that \textbf{learning means finding a set of values for the weights of all layers in a network, such that the network will correctly map example inputs to their associated targets} 
+\end{tcolorbox}
+\end{frame}
+%..................................................................
+\begin{frame}{Delta Rule}
+\begin{itemize}
+\item In order to get the derivative of our targets, chain rules would be applied:
+\begin{align*}
+&\frac{\partial L}{\partial W} =  \frac{\partial L}{\partial \hat y} \frac{\partial \hat y}{\partial Z} \frac{\partial Z}{\partial W} \\
+&\frac{\partial L}{\partial b} =  \frac{\partial L}{\partial \hat y} \frac{\partial \hat y}{\partial Z} \frac{\partial Z}{\partial b} 
+\end{align*}
+\item Let's focus only on the calculation of the derivative with respect to $W$ since the calculation of the other derivative (with respect to $b$) is completely equivalent...
+\end{itemize}
+\end{frame}
+%..................................................................
+\begin{frame}{Delta Rule}
+\begin{center}
+\includegraphics[scale=.5]{../5-pictures/03_intro_to_deep_learning_pic_20.png} 
+\end{center}
+The derivative of the Loss Function with respect to $\hat y$ is very easy and can be calculated once for all because it does not depend on the particular layer:
+\begin{align*}
+&L(y, \hat{y}) = -[y\log{\hat{y}} + (1 - y)\log{(1 - \hat{y})}] \\
+&\frac{\partial L}{\partial \hat y} = -\frac{y}{\hat y} + \frac{1-y}{1-\hat y} = \frac{\hat y - y}{\hat y(1 - \hat y)} \Rightarrow \\
+&\frac{\partial L}{\partial A^{[2]}} = \frac{A^{[2]} - y}{A^{[2]}(1 - A^{[2]})}
+\end{align*}
+\end{frame}
+%..................................................................
+\begin{frame}{Gradient Calculation}
+\begin{center}
+\includegraphics[scale=.5]{../5-pictures/03_intro_to_deep_learning_pic_20_b.png} 
+\end{center}
+\textbf{Hidden Layer Activation Function (Hyperbolic Tangent)}
+\begin{equation}
+\tanh x = \frac{{{e^x} -{e^{- x}}}}{{{e^x} + {e^{ -x}}}} 
+\Rightarrow 
+\frac{d}{{dx}}\tanh x =  1-{\left(\tanh x \right)}^2 
+\end{equation}
+\textbf{Output Layer Activation Function (Sigmoid Function)} 
+\begin{equation}
+\sigma(x) =  \left[ \dfrac{1}{1 + e^{-x}} \right]  \Rightarrow
+\dfrac{d}{dx} \sigma(x) =  \sigma(x) \cdot (1 - \sigma(x))
+\end{equation}
+\end{frame}
+%..................................................................
+\begin{frame}{Gradient Calculation}
+\textbf{Output Layer}
+\begin{align*}
+& \frac{\partial L}{\partial A^{[2]}} = \frac{A^{[2]} - y}{A^{[2]}(1 - A^{[2]})} \notag\\
+& \frac{\partial A^{[2]}}{\partial Z^{[2]}} = \frac{\partial \sigma(Z^{[2]})}{\partial Z^{[2]}} = \sigma(Z^{[2]}) \cdot (1 - \sigma(Z^{[2]})) 
+= A^{[2]} (1 - A^{[2]}) \\
+& \frac{\partial Z^{[2]}}{\partial W^{[2]}} = A^{[1]} 
+\end{align*}
+So the complete gradient is:
+
+\begin{tcolorbox}
+\begin{align*}
+\frac{\partial L}{\partial W^{[2]}} &=  
+\frac{A^{[2]} - y}{A^{[2]}(1 - A^{[2]})} \cdot 
+A^{[2]} (1 - A^{[2]}) \cdot {A^{[1]}}^T \\
+&= (A^{[2]} - y) \cdot {A^{[1]}}^T
+\end{align*}
+\end{tcolorbox}
+
+\end{frame}
+%..................................................................
+\begin{frame}{Gradient Calculation}
+\textbf{Hidden Layer}
+\begin{align*}
+& \frac{\partial L}{\partial A^{[2]}} = \frac{A^{[2]} - y}{A^{[2]}(1 - A^{[2]})} \notag\\
+& \frac{\partial A^{[2]}}{\partial Z^{[2]}} = \frac{\partial \sigma(Z^{[2]})}{\partial Z^{[2]}} = \sigma(Z^{[2]}) \cdot (1 - \sigma(Z^{[2]})) 
+= A^{[2]} (1 - A^{[2]}) \\
+& \frac{\partial Z^{[2]}}{\partial W^{[1]}} = \mathbf{?} 
+\end{align*}
+So the complete gradient is:
+\begin{align*}
+\frac{\partial L}{\partial W^{[1]}} &=  
+\frac{A^{[2]} - y}{A^{[2]}(1 - A^{[2]})} \cdot 
+A^{[2]} (1 - A^{[2]}) \cdot \frac{\partial Z^{[2]}}{\partial W^{[1]}} \\
+&= (A^{[2]} - y) \cdot \frac{\partial Z^{[2]}}{\partial W^{[1]}}
+\end{align*}
+\end{frame}
+%..................................................................
+\begin{frame}{Gradient Calculation}
+\textbf{Hidden Layer}
+Now we have to calculate
+$$\frac{\partial Z^{[2]}}{\partial W^{[1]}}$$
+Remember that
+$$Z^{[2]} = W^{[2]} \cdot tanh\left( W^{[1]} \cdot X + b^{[1]} \right) + b^{[2]}$$
+and
+$$\frac{\partial Z^{[2]}}{\partial W^{[1]}} = W^{[2]} \cdot \frac{\partial \, tanh(\dots)}{\partial W^{[1]}} \cdot X = W^{[2]} \cdot \left( 1 - tanh^2(\dots) \right) \cdot X$$
+\end{frame}
+%..................................................................
+\begin{frame}{Gradient Calculation}
+\textbf{Hidden Layer}\\
+\vspace{0.5cm}
+Finally
+\begin{tcolorbox}
+\begin{align*}
+\frac{\partial L}{\partial W^{[1]}} &= (A^{[2]} - y) \cdot W^{[2]} \cdot X \cdot \left( 1 - tanh^2(\dots) \right) \\
+&= (A^{[2]} - y) \cdot W^{[2]} \cdot X \cdot \left( 1 - {A^{[1]}}^2 \right)
+\end{align*}
+\end{tcolorbox}
+\end{frame}
+%..................................................................
+\begin{frame}{Weights Update}
+
+\textbf{Output Layer}
+
+Since
+
+\begin{equation}
+\frac{\partial L}{\partial W^{[2]}} = (A^{[2]} - y) \cdot {A^{[1]}}^T
+\end{equation}
+
+We have
+
+\begin{align}
+& dW^{[2]} = \frac{1}{m}\left[A^{[2]} - Y \right]A^{[1]^T} = \frac{1}{m}\Delta^{[2]}A^{[1]^T} \\
+& db^{[2]} = \frac{1}{m}np.sum(dZ^{[2]}, axis=1, keepdims=True) 
+\end{align}
+
+Where
+\begin{equation} 
+\Delta^{[2]} = A^{[2]} - Y  
+\end{equation}
+\end{frame}
+%..................................................................
+\begin{frame}{Weights Update}
+\textbf{Hidden Layer}
+
+\begin{align}
+dW^{[1]} &= \frac{1}{m} \left[ A^{[2]} - Y \right] \cdot  X^{T} \cdot W^{[2]T} \cdot (1 - A^{[1]^2}) \notag\\
+         &= \frac{1}{m} \Delta^{[2]} \cdot W^{[2]T} \cdot (1 - A^{[1]^2}) \cdot  X^{T}   \notag\\
+         &= \frac{1}{m} \Delta^{[1]} \cdot  X^{T} 
+\end{align}
+\begin{equation} 
+db^{[1]} = \frac{1}{m}np.sum(dZ^{[1]}, axis=1, keepdims=True)  
+\end{equation}
+Where
+$$\Delta^{[1]} = \Delta^{[2]} \cdot W^{[2]T} \cdot (1 - A^{[1]^2})$$
+\end{frame}
+%..................................................................
+\begin{frame}[fragile]
+\frametitle{Weights Update}
+\rule{\textwidth}{1pt}
+\scriptsize
+\begin{minted}{python}
+
+def backward(params, cache, X, Y):
+    m = X.shape[1]
+    W1 = params['W1']
+    W2 = params['W2']
+    A1 = cache['A1']
+    A2 = cache['A2']
+    DL2 = A2 - Y
+    dW2 = (1 / m) * np.dot(DL2, A1.T)
+    db2 = (1 / m) * np.sum(DL2, axis=1, keepdims=True)
+    DL1 = np.multiply(np.dot(W2.T, DL2), 1 - np.power(A1, 2))
+    dW1 = (1 / m) * np.dot(DL1, X.T)
+    db1 = (1 / m) * np.sum(DL1, axis=1, keepdims=True)
+    grads = {"dW1": dW1,
+             "db1": db1,
+             "dW2": dW2,
+             "db2": db2}
+
+    return grads
+\end{minted}
+\rule{\textwidth}{1pt}
+\end{frame}
+%..................................................................
+\section{Introduction to Keras}
+%---------------------------------------------------------------------------------------------------
+\begin{frame}{Introduction to keras}
+\textbf{What is Keras?}
+	\begin{itemize}
+	\item Keras is a high-level Deep Learning API that allows you to easily build, train, evaluate and execute all sorts of neural networks. 
+	\item Its documentation (or specification) is available at https://keras.io. \item It was developed by François Chollet as part of a research project and released as an open source project in March 2015. 
+\item It quickly gained popularity owing to its ease-of-use, flexibility and beautiful design. 
+\item To perform the heavy computations required by neural networks, keras-team relies on a computation backend. At the present, you can choose from three popular open source deep learning libraries: TensorFlow, Microsoft Cognitive Toolkit (CNTK) or Theano.
+	\end{itemize}
+\end{frame}
+%..................................................................
+\begin{frame}{Introduction to keras}
+	\begin{itemize}
+	\item The problem we are trying to solve here is to classify grayscale images of handwritten digits (28 pixels by 28 pixels), into their 10 categories (0 to 9). 
+	\item The dataset we will use is the MNIST dataset, a classic dataset in the machine learning community, which has been around for almost as long as the field itself and has been very intensively studied. It's a set of 60,000 training images, plus 10,000 test images, assembled by the National Institute of Standards and Technology (the NIST in MNIST) in the 1980s. 
+	\end{itemize}
+\end{frame}
+%..................................................................
+\begin{frame}{Introduction to keras}
+	\begin{itemize}
+		\item As we have said, in the MNIST dataset each digit is stored in a grayscale image with a size of 28x28 pixels. 
+		\item In the following you can see the first 10 digits from the training set:
+	\end{itemize}
+	\begin{center}
+	\includegraphics[scale=.75]{../5-pictures/chapter-1-add_pic_0.png}
+	\end{center}
+\end{frame}
+%..................................................................
+\begin{frame}[fragile]
+\frametitle{Introduction to keras: Loading the dataset}
+\begin{itemize}
+\item Keras provides seven different datasets, which can be loaded in using Keras directly. These include image datasets as well as a house price and a movie review datasets.
+\item The MNIST dataset comes pre-loaded in Keras, in the form of a set of four Numpy arrays
+\end{itemize}
+\rule{\textwidth}{1pt}
+\scriptsize
+\begin{minted}{python}
+import keras
+
+from keras.datasets import mnist
+
+(train_images, train_labels), (test_images, test_labels) = mnist.load_data()
+
+\end{minted}
+\rule{\textwidth}{1pt}
+\end{frame}
+%..................................................................
+\begin{frame}{Introduction to keras}
+\textbf{The typical Keras workflows}
+\vspace{0.5cm}
+	\begin{itemize}
+		\item Define your training data: input tensor and target tensor
+		\item Define a network of layers(or model ) that maps input to our targets.
+		\item Configure the learning process by choosing a loss function, an optimizer, and some metrics to monitor.
+		\item Iterate your training data by calling the fit() method of your model.
+	\end{itemize}
+\end{frame}
+%..................................................................
+\begin{frame}{Introduction to keras: Layers}
+	\begin{itemize}
+		\item This is the building block of neural networks which are stacked or combined together to form a neural network model.
+		\item It is a data-preprocessing module that takes one or more input tensors and outputs one or more tensors. 
+		\item These layers together contain the network's knowledge. 
+		\item Different layers are made for different tensor formats and data processing.
+	\end{itemize}
+\end{frame}
+%..................................................................
+\begin{frame}[fragile]
+\frametitle{Creating a model with the sequential API }
+	\begin{itemize}
+		\item The easiest way of creating a model in Keras is by using the sequential API, which lets you stack one layer after the other. 
+		\item The problem with the sequential API is that it doesn't allow models to have multiple inputs or outputs, which are needed for some problems.
+		\item Nevertheless, the sequential API is a perfect choice for most problems.
+	\end{itemize}
+\rule{\textwidth}{1pt}
+\scriptsize
+\begin{minted}{python}
+
+from keras import models
+from keras import layers
+
+network = models.Sequential()
+network.add(layers.Dense(512, activation='relu', input_shape=(28 * 28,)))
+network.add(layers.Dense(10, activation='softmax'))
+
+\end{minted}
+\rule{\textwidth}{1pt}
+\end{frame}
+%..................................................................
+\begin{frame}[fragile]
+\frametitle{Introduction to keras}
+Let’s go through this code line by line:
+\begin{itemize}
+\item The first line creates a Sequential model. 
+\item This is the simplest kind of Keras model, for neural networks that are just composed of a single stack of layers, connected sequentially. 
+\item This is called the \textbf{sequential} API.
+\end{itemize}
+
+\rule{\textwidth}{1pt}
+\scriptsize
+\begin{minted}{python}
+
+from keras import models
+from keras import layers
+
+network = models.Sequential()
+
+\end{minted}
+\rule{\textwidth}{1pt}
+\end{frame}
+%..................................................................
+\begin{frame}[fragile]
+\frametitle{Introduction to keras}
+
+Next, we build the first layer and add it to the model. 
+\begin{itemize}
+\item It is \textbf{\textit{Dense}} hidden layer with 512 neurons. 
+\item It will use the ReLU activation function. 
+\item Each Dense layer manages its own weight matrix, containing all the connection weights between the neurons and their inputs. 
+\item It also manages a vector of bias terms (one per neuron). 
+\item When it receives some input data, it computes 
+
+$$\phi \left( Z^{[1]} = W^{[1]} \cdot X + B^{[1]} \right), \quad \phi(z) = \textit{ReLU}(z)$$
+\end{itemize}
+\rule{\textwidth}{1pt}
+\scriptsize
+\begin{minted}{python}
+
+network.add(layers.Dense(512, activation='relu', input_shape=(28 * 28,)))
+
+\end{minted}
+\rule{\textwidth}{1pt}
+
+\end{frame}
+%..................................................................
+\begin{frame}[fragile]
+\frametitle{Introduction to keras}
+
+Finally, we add a Dense output layer with 10 neurons (one per class). 
+\begin{itemize}
+\item Using a 10-way "softmax" layer means that it will return an array of 10 probability scores (summing to 1). 
+\item Each score will be the probability that the current digit image belongs to one of our 10 digit classes.
+\end{itemize}
+
+\rule{\textwidth}{1pt}
+\scriptsize
+\begin{minted}{python}
+
+network.add(layers.Dense(10, activation='softmax'))
+
+\end{minted}
+\rule{\textwidth}{1pt}
+\end{frame}
+%..................................................................
+\begin{frame}[fragile]
+\frametitle{Introduction to keras}
+
+\begin{itemize}
+\item The model’s summary() method displays all the model’s layers, including each layer’s name (which is automatically generated unless you set it when creating the layer), its output shape (None means the batch size can be anything), and its number of parameters. 
+\end{itemize}
+\rule{\textwidth}{1pt}
+\scriptsize
+\begin{minted}{python}
+
+network.summary()
+
+\end{minted}
+\rule{\textwidth}{1pt}
+\end{frame}
+%..................................................................
+\begin{frame}{Introduction to keras}
+	\begin{itemize}
+\item The summary ends with the total number of parameters, including trainable and non-trainable parameters. 
+\item Here we only have trainable parameters.	
+	\end{itemize}
+	\begin{center}
+	\includegraphics[scale=.6]{../5-pictures/03_intro_to_deep_learning_pic_24.png} 
+	\end{center}
+\end{frame}
+%..................................................................
+\begin{frame}{Compile a Model}
+	\begin{itemize}
+		\item Before we can start training our model we need to configure the learning process. 
+		\item For this, we need to specify an optimizer, a loss function and optionally some metrics like accuracy.
+		\item The \textbf{loss function} is a measure on how good our model is at achieving the given objective.
+		\item An \textbf{optimizer} is used to minimize the loss(objective) function by updating the weights using the gradients.
+	\end{itemize}
+\end{frame}
+%..................................................................
+\begin{frame}{Loss Function}
+	\begin{itemize}
+		\item Choosing the right Loss Function for the problem is very important, the neural network can take any shortcut to minimize the loss. 
+		\item So, if the objective doesn't fully correlate with success for the task at hand, your network will end up doing things you may not have wanted.
+	\end{itemize}
+\end{frame}
+%..................................................................
+\begin{frame}{Loss Function}
+For common problems like Classification, Regression and Sequence prediction, they are simple guidelines to choose a loss function. 
+
+\vspace{0.5cm}
+For: \begin{itemize}
+\item Two- Class classification you can choose binary cross-entropy
+\item Multi-Class Classification you can choose Categorical Cross-entropy.
+\item Regression Problem you can choose Mean-Squared Error
+\end{itemize}
+\end{frame}
+%..................................................................
+\begin{frame}[fragile]
+\frametitle{Compile the model}
+\scriptsize
+
+So, to make our network ready for training, we need to pick three things, as part of "compilation" step:
+\begin{itemize}
+\item A loss function: the is how the network will be able to measure how good a job it is doing on its training data, and thus how it will be 
+able to steer itself in the right direction.
+\item  An optimizer: this is the mechanism through which the network will update itself based on the data it sees and its loss function.
+\item Metrics to monitor during training and testing. Here we will only care about accuracy (the fraction of the images that were correctly 
+classified).
+\end{itemize}
+
+\rule{\textwidth}{1pt}
+\begin{minted}{python}
+
+network.compile(optimizer='rmsprop',
+                loss='categorical_crossentropy',
+                metrics=['accuracy'])
+                
+\end{minted}
+\rule{\textwidth}{1pt}
+\end{frame}
+%..................................................................
+\begin{frame}[fragile]
+\frametitle{Introduction to keras: Training}
+\scriptsize
+
+	\begin{itemize}
+	\item 
+Before training, we will preprocess our data by reshaping it into the shape that the network expects, and scaling it so that all values are in 
+the `[0, 1]` interval. 
+\item Previously, our training images for instance were stored in an array of shape `(60000, 28, 28)` of type `uint8` with 
+values in the `[0, 255]` interval. 
+\item We transform it into a `float32` array of shape `(60000, 28 * 28)` with values between 0 and 1.
+	\end{itemize}
+\rule{\textwidth}{1pt}
+\begin{minted}{python}
+
+train_images = train_images.reshape((60000, 28 * 28))
+train_images = train_images.astype('float32') / 255
+
+test_images = test_images.reshape((10000, 28 * 28))
+test_images = test_images.astype('float32') / 255
+
+\end{minted}
+\rule{\textwidth}{1pt}
+\end{frame}
+%..................................................................
+\begin{frame}[fragile]
+\frametitle{Introduction to keras: Training}
+
+We also need to categorically encode the labels:
+
+\rule{\textwidth}{1pt}
+\begin{minted}{python}
+
+from keras.utils.np_utils import to_categorical
+
+train_labels = to_categorical(train_labels)
+test_labels = to_categorical(test_labels)
+
+\end{minted}
+\rule{\textwidth}{1pt}
+\end{frame}
+%..................................................................
+\begin{frame}[fragile]
+\frametitle{Introduction to keras: Training}
+\textbf{What is an epoc?}
+\footnotesize
+	\begin{itemize}
+	\item 
+An epoch is a term used in machine learning and indicates the number of passes of the entire training dataset the machine learning algorithm has completed. Datasets are usually grouped into batches (especially when the amount of data is very large). Some people use the term iteration loosely and refer to putting one batch through the model as an iteration.   
+\item
+If the batch size is the whole training dataset then the number of epochs is the number of iterations. For practical reasons, this is usually not the case. Many models are created with more than one epoch. The general relation where dataset size is $d$, number of epochs is $e$, number of iterations is $i$, and batch size is $b$ would be $d \cdot e = i \cdot b$. 
+\item 
+Determining how many epochs a model should run to train is based on many parameters related to both the data itself and the goal of the model, and while there have been efforts to turn this process into an algorithm, often a deep understanding of the data itself is indispensable.
+
+	\end{itemize}
+\end{frame}
+%..................................................................
+\begin{frame}[fragile]
+\frametitle{Introduction to keras: Training}
+We are now ready to train our network, which in Keras is done via a call to the `fit` method of the network: we "fit" the model to its training data.
+\vspace{0.5cm}
+\scriptsize
+\rule{\textwidth}{1pt}
+\begin{minted}{python}
+
+history = network.fit(train_images, train_labels, epochs=5, batch_size=128)
+
+\end{minted}
+\rule{\textwidth}{1pt}
+\end{frame}
+%..................................................................
+\begin{frame}[fragile]
+\frametitle{Visualizing the training process }
+\scriptsize
+	\begin{itemize}
+		\item We can visualize our training and testing accuracy and loss for each epoch so we can get intuition about the performance of our model. 
+		\item The accuracy and loss over epochs are saved in the history variable we got whilst training and we will use Matplotlib to visualize this data.
+	\end{itemize}
+
+\rule{\textwidth}{1pt}
+\begin{minted}{python}
+
+# list all data in history
+print(history.history.keys())
+# summarize history for accuracy
+plt.plot(history.history['mae'])
+plt.plot(history.history['val_mae'])
+plt.title('model mae')
+plt.ylabel('mae')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.show()
+
+\end{minted}
+\rule{\textwidth}{1pt}
+\end{frame}
+%..................................................................
+%=====================================================================
+
+
+\end{document}
+
+%..................................................................
+\begin{frame}[fragile]
+\frametitle{Introduction to keras: Training}
+	\begin{itemize}
+	\item
+	\end{itemize}
+\end{frame}
+%..................................................................
+\begin{frame}[fragile]
+\frametitle{Introduction to keras: Training}
+	\begin{itemize}
+	\item
+	\end{itemize}
+\end{frame}
