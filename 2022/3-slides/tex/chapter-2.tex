@@ -665,6 +665,34 @@ implied volatility and the actual change.
 \end{itemize}
 \end{frame}
 %..................................................................
+\begin{frame}[fragile]
+\frametitle{Neural Network Architecture}
+\rule{\textwidth}{1pt}
+\scriptsize
+\begin{minted}{python}
+# Create ML Model
+#
+# Sequential function allows you to define your Neural Network in sequential 
+# order. Within Sequential, use Dense function to define number of nodes, 
+# activation function and other related parameters. For more information 
+# regrading to activation function, please refer to 
+#
+# https://keras.io/activations/
+#
+model = keras.models.Sequential([Dense(20,activation = "sigmoid",
+                                             input_shape = (3,))
+                                ,Dense(20,activation = "sigmoid")
+                                ,Dense(20,activation = "sigmoid")
+                                ,Dense(1)])
+# Model summary function shows what you created in the model
+model.summary()
+# Complie function allows you to choose your measure of loss and optimzer
+# For other optimizer, please refer to https://keras.io/optimizers/
+model.compile(loss = "mse",optimizer = "Adam")
+\end{minted}
+\rule{\textwidth}{1pt}
+\end{frame}
+%..................................................................
 \begin{frame}{Benchmark Model}
 \begin{itemize}
 \item In constructing a machine learning model, it is always useful to have
@@ -680,6 +708,184 @@ by Hull and White (2017) and is quite popular with practitioners.
 \item The $a$, $b$, and $c$ can be estimated by regressing implied volatility changes
 against $R/\sqrt{T}$, $R\delta/\sqrt{T}$, and $R\delta^2/\sqrt{T}$.
 \end{itemize}
+\end{frame}
+%..................................................................
+\begin{frame}[fragile]
+\frametitle{Benchmark Model}
+\textbf{Building variables for linear regression}
+\rule{\textwidth}{1pt}
+\scriptsize
+\begin{minted}{python}
+
+R     = raw['SPX Return']
+RAD_T = np.sqrt(raw['Time to Maturity in Year'])
+DELTA = raw['Delta']
+# construct the 3 variables for regression
+raw['x1'] = R / RAD_T
+raw['x2'] = (R / RAD_T) * DELTA
+raw['x3'] = (R / RAD_T) * DELTA * DELTA
+
+# Put the X and Y variable in data frame for regression
+y = raw['Implied Volatility Change']
+X = raw[['x1', 'x2', 'x3','SPX Return','Time to Maturity in Year','Delta']]
+
+\end{minted}
+\rule{\textwidth}{1pt}
+\end{frame}
+%..................................................................
+\begin{frame}[fragile]
+\frametitle{Benchmark Model}
+\textbf{Create training, test and validation set}
+\rule{\textwidth}{1pt}
+\scriptsize
+\begin{minted}{python}
+
+# Divide data into training set and test set(note that random seed is set)
+X_train,X_test,y_train,y_test=train_test_split(  X
+                                               , y
+                                               , test_size    = 0.2
+                                               , random_state = 100)
+
+# Divide training set into training and validation set
+X_train,X_val,y_train,y_val=train_test_split(  X_train
+                                             , y_train
+                                             , test_size    = 0.25
+                                             , random_state = 100)
+\end{minted}
+\rule{\textwidth}{1pt}
+\end{frame}
+%..................................................................
+\begin{frame}[fragile]
+\frametitle{Benchmark Model}
+\textbf{Run Regression}
+\rule{\textwidth}{1pt}
+\scriptsize
+\begin{minted}{python}
+
+# Run the regression on the training data
+lr = LinearRegression(fit_intercept=False)
+lr.fit(X_scaled_train[:,:3], y_train)
+
+# Get the prediction
+y_pred = lr.predict(X_scaled_test[:,:3])
+
+# Calculate Mean Squared Error
+mse = mean_squared_error(y_test, y_pred)
+
+print('Test loss (MSE):', mse)
+
+\end{minted}
+\rule{\textwidth}{1pt}
+\end{frame}
+%..................................................................
+\begin{frame}{Check-Point Deep Learning Models}
+\begin{itemize}
+\item Deep learning models can take hours, days or even weeks to train.
+\item If the run is stopped unexpectedly, you can lose a lot of work.
+\item You can check-point your deep learning models during training in Python using the Keras library.
+\item A snapshot of the state of the system is taken in case of system failure. If there is a problem, not all is lost. 
+\item The checkpoint may be used directly, or used as the starting point for a new run, picking up where it left off.
+\end{itemize}
+\end{frame}
+%..................................................................
+\begin{frame}{Check-Point Deep Learning Models}
+\begin{itemize}
+\item The ModelCheckpoint callback class allows you to define where to checkpoint the model weights, how the file should named and under what circumstances to make a checkpoint of the model.
+
+\item The API allows you to specify which metric to monitor, such as loss or accuracy on the training or validation dataset. You can specify whether to look for an improvement in maximizing or minimizing the score. Finally, the filename that you use to store the weights can include variables like the epoch number or metric.
+
+\item The ModelCheckpoint can then be passed to the training process when calling the fit() function on the model.
+
+\item Note, you may need to install the h5py library to output network weights in HDF5 format.
+\end{itemize}
+\end{frame}
+%..................................................................
+\begin{frame}{Check-Point Deep Learning Models}
+\begin{itemize}
+\footnotesize
+\item The Hierarchical Data Format version 5 (HDF5), is an open source file format that supports large, complex, heterogeneous data. 
+\item HDF5 uses a "file directory" like structure that allows you to organize data within the file in many different structured ways, as you might do with files on your computer. 
+\end{itemize}
+\begin{center}
+\includegraphics[scale=.175]{../5-pictures/hdf5_structure4.jpg} 
+\end{center}
+\end{frame}
+%..................................................................
+\begin{frame}[fragile]
+\frametitle{Check-Point Deep Learning Models}
+\scriptsize
+\begin{itemize}
+\item Checkpointing is setup to save the network weights only when there is an improvement in classification accuracy on the validation dataset (monitor=’val\textunderscore accuracy’ and mode=’max’).
+\item The weights are stored in a file 'implied\textunderscore vol\textunderscore model\textunderscore vFinal.h5.h5'
+\end{itemize}
+\rule{\textwidth}{1pt}
+\begin{minted}{python}
+
+# Checkpoint function is used here to periodically save a copy of the model. 
+# Currently it is set to save the best performing model
+checkpoint_cb = keras.callbacks.ModelCheckpoint("implied_vol_model_vFinal.h5"
+                                                , monitor='val_accuracy'
+                                                , verbose=1
+                                                , save_best_only=True
+                                                , mode='max')
+
+# Early stopping allows you to stop your training early if no improvment is 
+# shown after certain period. Currently it is set at if no improvement 
+# occured in 1000 epochs, at the stop the model will also revert back to 
+# the best weight.
+early_stopping_cb = keras.callbacks.EarlyStopping(patience = 1000
+
+\end{minted}
+\rule{\textwidth}{1pt}
+\end{frame}
+%..................................................................
+\begin{frame}[fragile]
+\frametitle{Train the Model}
+\scriptsize
+\rule{\textwidth}{1pt}
+\begin{minted}{python}
+
+# The fit function allows you to train a NN model. Here we have training data, 
+# number of epochs,batch size, validation data, and callbacks as input
+# Callback is an optional parameters that allow you to enable tricks for 
+# training such as early stopping and checkpoint
+
+# Remarks: Altough we put 50000 epochs here, the model will stop its training 
+# once our early stopping criterion is triggered
+
+history=model.fit(  X_scaled_train[:,3:6]
+                  , y_train
+                  , epochs=10
+                  , batch_size = 128
+                  , verbose = 1
+                  , validation_data=(X_scaled_vals[:,3:6],y_val)
+                  , callbacks=[checkpoint_cb, early_stopping_cb])
+
+\end{minted}
+\rule{\textwidth}{1pt}
+\end{frame}
+%..................................................................
+\begin{frame}[fragile]
+\frametitle{Train the Model}
+\scriptsize
+\rule{\textwidth}{1pt}
+\begin{minted}{python}
+
+# Load the best model you saved and calcuate MSE for testing set
+
+model = keras.models.load_model("implied_vol_model_vFinal.h5")
+mse_test = model.evaluate(X_scaled_test[:,3:6],y_test,verbose=0)
+
+print('Test Loss(MSE):', mse_test)
+
+# Calculate Gain Ratio
+
+gain = 1 - mse_test/mse 
+
+print('Gain Ratio:', gain)
+
+\end{minted}
+\rule{\textwidth}{1pt}
 \end{frame}
 %..................................................................
 \begin{frame}{Mean Squared Error (Training stopped after 5,826 epochs)}
