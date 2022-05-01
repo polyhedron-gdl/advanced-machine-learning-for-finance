@@ -4,8 +4,8 @@ Created on 19 apr 2022
 @author: User
 '''
 # Define number of paths being generated for training and testing 
-TRAINING_SAMPLE = 3000000
-TESTING_SAMPLE = 100000
+TRAINING_SAMPLE = 30000
+TESTING_SAMPLE = 1000
 
 # Define the characteristic of the underlying stock process
 # Annual Return for stock

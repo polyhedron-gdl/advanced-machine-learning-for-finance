@@ -2,11 +2,11 @@ import matplotlib.pyplot as plt
 import pandas            as pd
 import numpy             as np
 
-from finlib  import brownian_sim, bs_call
-from tqdm    import tqdm
+from RL_finlib  import brownian_sim, bs_call
+from tqdm       import tqdm
 
 # Start program
-import setting as s
+import RL_setting as s
 #
 # Daily time step
 dt = 1/s.T
