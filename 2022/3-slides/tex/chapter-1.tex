@@ -527,7 +527,7 @@ print('b2 shape', params['b2'].shape)
 \scriptsize
 
 \begin{align*}
-\hat y &= A^{[2]} = \sigma(Z^{[2]} = \sigma \left( W^{[2]} \cdot A^{[1]} + B^{[2]} \right) \\
+\hat y &= A^{[2]} = \sigma\left(Z^{[2]}\right) = \sigma \left( W^{[2]} \cdot A^{[1]} + B^{[2]} \right) \\
 &= \sigma \left( W^{[2]} \cdot \tanh{Z^{[1]}} + B^{[2]} \right) \\
 &= \sigma \left[ W^{[2]} \cdot \tanh\left( W^{[1]} \cdot X + B^{[1]} \right) + B^{[2]} \right]
 \end{align*}
@@ -606,8 +606,8 @@ def loss(Y, Y_hat):
 \item Here we have 2 variables, $W$ and $b$, and for this example, the update formula of them would be:
 
 \begin{align*}
-&W = W - \frac{\partial L}{\partial W} \\
-&b = b - \frac{\partial L}{\partial b}
+W_{new} = W_{old} - \frac{\partial L}{\partial W} &\Rightarrow \Delta W = - \frac{\partial L}{\partial W} \\
+b_{new} = b_{old} - \frac{\partial L}{\partial b} &\Rightarrow \Delta b = - \frac{\partial L}{\partial b} \\
 \end{align*}
 
 \end{itemize}
@@ -618,7 +618,7 @@ def loss(Y, Y_hat):
 \item The delta rule algorithm works by computing the gradient of the loss function with respect to each weight. 
 \item Remember that
 \begin{align*}
-\hat y &= A^{[2]} = \sigma(Z^{[2]} = \sigma \left( W^{[2]} \cdot A^{[1]} + B^{[2]} \right) \\
+\hat y &= A^{[2]} = \sigma\left(Z^{[2]}\right) = \sigma \left( W^{[2]} \cdot A^{[1]} + B^{[2]} \right) \\
 &= \sigma \left( W^{[2]} \cdot \tanh{Z^{[1]}} + B^{[2]} \right) \\
 &= \sigma \left[ W^{[2]} \cdot \tanh\left( W^{[1]} \cdot X + B^{[1]} \right) + B^{[2]} \right]
 \end{align*}
@@ -741,8 +741,8 @@ Since
 We have
 
 \begin{align}
-& dW^{[2]} = \frac{1}{m}\left[A^{[2]} - Y \right]A^{[1]^T} = \frac{1}{m}\Delta^{[2]}A^{[1]^T} \\
-& db^{[2]} = \frac{1}{m}np.sum(dZ^{[2]}, axis=1, keepdims=True) 
+& \Delta W^{[2]} = \frac{1}{m}\left[A^{[2]} - Y \right]A^{[1]^T} = \frac{1}{m}\Delta^{[2]}A^{[1]^T} \\
+& \Delta b^{[2]} = \frac{1}{m}np.sum(dZ^{[2]}, axis=1, keepdims=True) 
 \end{align}
 
 Where
@@ -755,12 +755,12 @@ Where
 \textbf{Hidden Layer}
 
 \begin{align}
-dW^{[1]} &= \frac{1}{m} \left[ A^{[2]} - Y \right] \cdot  X^{T} \cdot W^{[2]T} \cdot (1 - A^{[1]^2}) \notag\\
+\Delta W^{[1]} &= \frac{1}{m} \left[ A^{[2]} - Y \right] \cdot  X^{T} \cdot W^{[2]T} \cdot (1 - A^{[1]^2}) \notag\\
          &= \frac{1}{m} \Delta^{[2]} \cdot W^{[2]T} \cdot (1 - A^{[1]^2}) \cdot  X^{T}   \notag\\
          &= \frac{1}{m} \Delta^{[1]} \cdot  X^{T} 
 \end{align}
 \begin{equation} 
-db^{[1]} = \frac{1}{m}np.sum(dZ^{[1]}, axis=1, keepdims=True)  
+\Delta b^{[1]} = \frac{1}{m}np.sum(dZ^{[1]}, axis=1, keepdims=True)  
 \end{equation}
 Where
 $$\Delta^{[1]} = \Delta^{[2]} \cdot W^{[2]T} \cdot (1 - A^{[1]^2})$$
@@ -809,7 +809,8 @@ def backward(params, cache, X, Y):
 \begin{frame}{Introduction to keras}
 	\begin{itemize}
 	\item The problem we are trying to solve here is to classify grayscale images of handwritten digits (28 pixels by 28 pixels), into their 10 categories (0 to 9). 
-	\item The dataset we will use is the MNIST dataset, a classic dataset in the machine learning community, which has been around for almost as long as the field itself and has been very intensively studied. It's a set of 60,000 training images, plus 10,000 test images, assembled by the National Institute of Standards and Technology (the NIST in MNIST) in the 1980s. 
+	\item The dataset we will use is the MNIST dataset, a classic dataset in the machine learning community, which has been around for almost as long as the field itself and has been very intensively studied. 
+	\item It's a set of 60,000 training images, plus 10,000 test images, assembled by the National Institute of Standards and Technology (the NIST in MNIST) in the 1980s. 
 	\end{itemize}
 \end{frame}
 %..................................................................
@@ -826,7 +827,8 @@ def backward(params, cache, X, Y):
 \begin{frame}[fragile]
 \frametitle{Introduction to keras: Loading the dataset}
 \begin{itemize}
-\item Keras provides seven different datasets, which can be loaded in using Keras directly. These include image datasets as well as a house price and a movie review datasets.
+\item Keras provides seven different datasets, which can be loaded in using Keras directly. 
+\item These include image datasets as well as a house price and a movie review datasets.
 \item The MNIST dataset comes pre-loaded in Keras, in the form of a set of four Numpy arrays
 \end{itemize}
 \rule{\textwidth}{1pt}
@@ -1002,6 +1004,84 @@ For: \begin{itemize}
 \end{itemize}
 \end{frame}
 %..................................................................
+\begin{frame}{Activation Function}
+\textbf{Softmax Activation Function} 
+\vspace{0.5cm}
+\begin{itemize}
+\item Softmax is an activation function that scales numbers/logits into probabilities. 
+\item The output of a Softmax is a vector (say $v$) with probabilities of each possible outcome. 
+\item The probabilities in vector $v$ sums to one for all possible outcomes or classes 
+\item It is often used as the last activation function of a neural network to normalize the output of a network to a probability distribution over predicted output classes
+\item You can think of softmax function as a sort of generalization to multiple dimension of the logistic function
+\end{itemize}
+\end{frame}
+%..................................................................
+\begin{frame}{Activation Function}
+\textbf{Softmax Activation Function.} 
+Mathematically, softmax is defined as
+\begin{equation}
+S(y)_i= \frac{\exp{y_i}}{\sum\limits_{j=1}^n \, \exp{y_j}}
+\end{equation}
+\begin{center}
+\includegraphics[scale=.45]{../5-pictures/softmax_1.jpeg} 
+\end{center}
+\end{frame}
+%..................................................................
+\begin{frame}{Loss Function}
+\textbf{Categorical Cross-Entropy} 
+\begin{itemize}
+\item Remember the logistic Loss Function:
+$$
+L(y, \hat y) = - y \, \log \hat y - (1-y) \, \log(1-\hat y) = -\sum\limits_{j=1}^2 \, y_j \log \hat y_j
+$$
+\item Generalizing this result to the n-class classification problem we have
+\begin{equation}
+L = -\sum\limits_{j=1}^{N_C} \, y_j \log \hat y_j
+\end{equation}
+This last equation define the so called \textit{cross-entropy}
+\end{itemize}
+\end{frame}
+%..................................................................
+\begin{frame}{Loss Function}
+\textbf{Categorical Cross-Entropy} 
+\begin{itemize}
+\item In the previous example, Softmax converts logits into probabilities. 
+\item The purpose of the Cross-Entropy is to take the output probabilities ($P$) and measure the distance from the truth values
+
+\end{itemize}
+\begin{center}
+\includegraphics[scale=.45]{../5-pictures/softmax_2.jpeg} 
+\end{center}
+\end{frame}
+%..................................................................
+\begin{frame}{Loss Function}
+\textbf{Categorical Cross-Entropy} 
+\begin{itemize}
+\item The categorical cross-entropy is computed as follows
+\end{itemize}
+\begin{center}
+\includegraphics[scale=.45]{../5-pictures/softmax_3.jpeg} 
+\end{center}
+\end{frame}
+%..................................................................
+\begin{frame}{Optimizer}
+\textbf{RMSProp} 
+\scriptsize
+\begin{itemize}
+\item Gradient descent is an optimization algorithm that follows the negative gradient of an objective function in order to locate the minimum of the function.
+
+\item A limitation of gradient descent is that it uses the same step size (learning rate) for each input variable. 
+
+\item AdaGrad is an extension of the gradient descent optimization algorithm that allows the step size in each dimension used by the optimization algorithm to be automatically adapted based on the gradients seen for the variable (partial derivatives) over the course of the search.
+
+\item A limitation of AdaGrad is that it can result in a very small step size for each parameter by the end of the search that can slow the progress of the search down too much and may mean not locating the optima.
+
+\item Root Mean Squared Propagation, or RMSProp, is an extension of gradient descent and the AdaGrad version of gradient descent that uses a decaying average of partial gradients in the adaptation of the step size for each parameter. 
+
+\item The use of a decaying moving average allows the algorithm to forget early gradients and focus on the most recently observed partial gradients seen during the progress of the search, overcoming the limitation of AdaGrad. 
+\end{itemize}
+\end{frame}
+%..................................................................
 \begin{frame}[fragile]
 \frametitle{Compile the model}
 \scriptsize
@@ -1057,6 +1137,7 @@ test_images = test_images.astype('float32') / 255
 We also need to categorically encode the labels:
 
 \rule{\textwidth}{1pt}
+\scriptsize
 \begin{minted}{python}
 
 from keras.utils.np_utils import to_categorical
