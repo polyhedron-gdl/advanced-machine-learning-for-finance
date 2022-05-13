@@ -44,7 +44,7 @@
 %\title{2.1 - Data Pre-Processing}
 %\title{4.1 - Linear and Logistic Regression}
 %\title{4.2 - Decision Trees}
-\title{Deep Learning Derivatives Pricing}
+\title{2 - Deep Learning Derivatives Pricing}
 %\title{5 - Introduction to Reinforcement Learning}
 \subtitle{} % (optional)
 \setbeamercovered{transparent} 
@@ -223,7 +223,7 @@ trained to compute prices given a point in $\mathbb{R}^D $ representing a partic
 \begin{frame}{Deep Learning Option Pricing}
 	\begin{itemize}
 		\item The use of a NN as a pricing functions has a number of advantages. 
-		\item The first is that in this way we are able to compute efficiently thousands of prices in a small amount of time, even when the derivative contract has complicated conditions and when the model is complex. 
+		\item The first is that \highlight{\text{in this way we are able to compute efficiently thousands of prices}} \highlight{\text{in a small amount of time}}, even when the derivative contract has complicated conditions and when the model is complex. 
 		\item This comes with the downside that the neural network \textbf{may introduce systematic errors} that could affect our estimation of the sensitivities in a number of ways. 
 
 	\end{itemize}
@@ -231,7 +231,7 @@ trained to compute prices given a point in $\mathbb{R}^D $ representing a partic
 %..................................................................
 \begin{frame}{Deep Learning Option Pricing}
 	\begin{itemize}
-		\item The second advantage is that instead of training the network on the model parameters, which in general are not observable, we could train the network \textbf{using data that is directly observable in the market}. 
+		\item The second advantage is that \highlight{\text{instead of training the network on the model parameters, which}} \highlight{\text{in general are not observable, we could train the network}} \highlight{\text{\textbf{using data that is directly observable in the market}}}. 
 		\item For example quotes and trades by market participants provide points on the
 volatility surface. 
 \item Interpolating between these points as necessary, a trader can derive a reasonable

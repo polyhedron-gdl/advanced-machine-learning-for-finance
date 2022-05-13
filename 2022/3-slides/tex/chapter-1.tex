@@ -794,6 +794,14 @@ def backward(params, cache, X, Y):
 \rule{\textwidth}{1pt}
 \end{frame}
 %..................................................................
+\begin{frame}{Batch Training}
+\begin{itemize}
+\item In actual training processes, a batch is trained instead of 1 at a time. The change applied in the formula is trivial, we just need to replace the single vector $x$ with a matrix $X$ with size $n \times m$, where $n$ is number of features and $m$ is the the batch size, samples are stacked column wise, and the following result matrix are applied likewise.
+\item Also the loss function is the same as logistic regression, but for batch training, we'll take the average loss for all training samples.
+\item The same it's true for all the other calculation, this explain the presence of the factor $1/m$;
+\end{itemize}
+\end{frame}
+%..................................................................
 \section{Introduction to Keras}
 %---------------------------------------------------------------------------------------------------
 \begin{frame}{Introduction to keras}
